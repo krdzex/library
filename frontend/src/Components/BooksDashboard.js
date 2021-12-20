@@ -1,4 +1,4 @@
-import { Container, InputBase, Typography,Box } from '@mui/material';
+import { Container, InputBase, Typography, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
@@ -31,7 +31,8 @@ const useStyles = makeStyles({
     },
     box: {
         display: "flex",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        alignItems: "center"
     }
 })
 
@@ -50,29 +51,28 @@ const BooksDashboard = () => {
         { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
         { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
         { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-      ];
+    ];
 
-      const columns = [
+    const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
         { field: 'firstName', headerName: 'Title', width: 500 },
         { field: 'lastName', headerName: 'Pages', width: 130 },
         {
-          headerName: 'Price',
-          type: 'number',
-          width: 90,
+            headerName: 'Price',
+            type: 'number',
+            width: 90,
         },
         {
-          field: 'fullName',
-          headerName: 'Full name',
-          description: 'This column has a value getter and is not sortable.',
-          sortable: false,
-          width: 160,
-          valueGetter: (params) =>
-            `${params.getValue(params.id, 'firstName') || ''} ${
-              params.getValue(params.id, 'lastName') || ''
-            }`,
+            field: 'fullName',
+            headerName: 'Full name',
+            description: 'This column has a value getter and is not sortable.',
+            sortable: false,
+            width: 160,
+            valueGetter: (params) =>
+                `${params.getValue(params.id, 'firstName') || ''} ${params.getValue(params.id, 'lastName') || ''
+                }`,
         },
-      ];
+    ];
 
     return (
         <div>
