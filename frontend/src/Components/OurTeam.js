@@ -14,7 +14,7 @@ const OurTeam = () => {
     return (
         <div>
             <Header />
-            <Container maxWidth="md" component="main" sx={{ mt: 12 }}>
+            <Container maxWidth="md" component="main" sx={{ mt: 12,mb:5 }}>
                 <Typography variant='h2' mb={3}>Our Team</Typography>
                 <Grid container spacing={5} alignItems="flex-end">
                     <Grid
@@ -23,9 +23,8 @@ const OurTeam = () => {
                         md={4}
                     >
                         <Card>
-                            <Container sx={{ display: "flex", justifyContent: "center" }}>
+                            <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person1.jpg`} sx={{ width: 100, height: 100 }} />
-
                             </Container>
                             <CardContent>
                                 <Box
@@ -59,7 +58,8 @@ const OurTeam = () => {
                         md={4}
                     >
                         <Card>
-                            <Container sx={{ display: "flex", justifyContent: "center" }}>
+                        <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
+
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person2.jpg`} sx={{ width: 100, height: 100 }} />
 
                             </Container>
@@ -94,7 +94,8 @@ const OurTeam = () => {
                         md={4}
                     >
                         <Card>
-                            <Container sx={{ display: "flex", justifyContent: "center" }}>
+                        <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
+
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person3.jpg`} sx={{ width: 100, height: 100 }} />
 
                             </Container>

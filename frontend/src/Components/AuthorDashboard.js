@@ -38,7 +38,7 @@ const useStyles = makeStyles({
 
 
 
-const BooksDashboard = () => {
+const AuthorDashboard = () => {
     const classes = useStyles();
 
     const rows = [
@@ -79,10 +79,9 @@ const BooksDashboard = () => {
             <Header />
             <Container component="main" maxWidth="lg" sx={{ mt: 15 }}>
             <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-
                 <Box className={classes.box}>
                     <Typography variant='h2'>
-                        Books
+                        Authors
                     </Typography>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
@@ -109,4 +108,4 @@ const BooksDashboard = () => {
     );
 };
 
-export default BooksDashboard;
+export default AuthorDashboard;
