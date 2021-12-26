@@ -1,0 +1,14 @@
+import express from "express";
+import bookController from "../controller/books.controller";
+
+const router = express.Router()
+
+router.route("/api/books").post(bookController.createBook).get(bookController.listBooks)
+router.route("/api/books/:bookId").get(bookController.booksInformations).put(bookController.updateBook)
+
+
+
+
+
+
+export default router;
