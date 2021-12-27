@@ -110,6 +110,8 @@ const EditBook = () => {
         updateBook(bookId, formData).then(res => {
             if (res.message) {
                 setValues({ ...values, redirect: true })
+            } else {
+                setErrors(res)
             }
         }).catch(err => console.log(err))
 

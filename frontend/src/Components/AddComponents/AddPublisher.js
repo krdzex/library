@@ -35,7 +35,6 @@ const AddPublisher = () => {
 
     const onSubmit = async (e) => {
         let errorObject = {}
-        e.preventDefault()
         for (var key in values) {
             if (values[key] === "")
                 errorObject[key] = `${key[0].toUpperCase()}${key.slice(1)} is required`
@@ -47,17 +46,19 @@ const AddPublisher = () => {
 
         e.preventDefault()
         let publisher = {
-            name: values.name,
+            name: values.name || undefined,
             address: {
-                road: values.road,
-                zipCode: values.zipCode,
-                city: values.city,
-                country: values.country,
+                road: values.road || undefined,
+                zipCode: values.zipCode || undefined,
+                city: values.city || undefined,
+                country: values.country || undefined,
             }
         }
         createPublisher(publisher).then(response => {
             if (response.message) {
                 setValues({ ...values, redirect: true })
+            } else {
+                setErrors(response)
             }
         }).catch(err => console.log(err))
     }

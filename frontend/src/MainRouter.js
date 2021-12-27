@@ -10,6 +10,7 @@ import BooksDashboard from "./Components/DashboardComponents/BooksDashboard"
 import PublisherDashboard from "./Components/DashboardComponents/PublisherDashboard"
 import EditPublisher from './Components/EditComponents/EditPublisher';
 import EditBook from './Components/EditComponents/EditBook';
+import EditAuthor from './Components/EditComponents/EditAuthor';
 
 const MainRouter = () => {
 
@@ -27,6 +28,7 @@ const MainRouter = () => {
                 <Route path="/booksDashboard" element={<BooksDashboard />} />
                 <Route path="/editPublisher/:publisherId" element={<EditPublisher />} />
                 <Route path="/editBook/:bookId" element={<EditBook />} />
+                <Route path="/editAuthor/:authorId" element={<EditAuthor />} />
 
             </Routes>
         </div>

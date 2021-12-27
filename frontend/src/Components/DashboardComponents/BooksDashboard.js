@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-import { listBooks } from '../../ApiService/booksApi';
+import { deleteBook, listBooks, searchedBooks } from '../../ApiService/booksApi';
 
 const useStyles = makeStyles({
     search: {
@@ -44,9 +44,15 @@ const BooksDashboard = () => {
     const navigate = useNavigate()
     const classes = useStyles();
     const [allBooks, setAllBooks] = useState([])
+    const [searchValue, setSearchValue] = useState("")
+    const [loading, setLoading] = useState(true)
+
 
     useEffect(() => {
-        listBooks().then(res => setAllBooks(res)).catch(err => console.log(err))
+        listBooks().then(res => {
+            setAllBooks(res);
+            setLoading(false)
+        }).catch(err => console.log(err))
     }, [])
 
     const rows = allBooks.map((book, id) => {
@@ -54,17 +60,18 @@ const BooksDashboard = () => {
     })
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'id', headerName: 'ID', width: 70, headerAlign: "center", align: "center" },
         {
             field: 'title', headerName: 'Title', flex: 1,
             minWidth: 150
         },
-        { field: 'pages', headerName: 'Pages', width: 130, type: 'number',headerAlign: 'center', },
+        { field: 'pages', headerName: 'Pages', width: 130, type: 'number', headerAlign: "center", align: "center" },
         {
             field: 'price',
             type: 'number',
             headerName: 'Price',
-            headerAlign: 'center',
+            headerAlign: "center",
+            align: "center",
             width: 90,
         },
         {
@@ -75,7 +82,7 @@ const BooksDashboard = () => {
             renderCell: (params) => (
                 <Box >
                     <Button variant="contained" sx={{ mr: 1 }} onClick={() => onEditClick(params)}>Edit</Button>
-                    <Button variant="contained" sx={{ background: "red" }}>Delete</Button>
+                    <Button variant="contained" sx={{ background: "red" }} onClick={() => onDeleteClick(params)}>Delete</Button>
                 </Box>
 
             )
@@ -86,11 +93,32 @@ const BooksDashboard = () => {
         navigate(`/editBook/${cellInfo.row._id}`);
     }
 
+    const onDeleteClick = (cellInfo) => {
+        deleteBook(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
+        let newBooks = allBooks.filter(book => book._id !== cellInfo.row._id);
+        setAllBooks(newBooks)
+    }
+
+
     const onHeaderClick = (e) => {
         if (e.colDef.headerName === "Add") {
             navigate("/addBook");
         }
     }
+
+    const onSearch = (e) => {
+        e.preventDefault()
+        if (searchValue !== "") {
+            searchedBooks(searchValue).then(res => setAllBooks(res)).catch(err => console.log(err))
+        } else {
+            listBooks().then(res => setAllBooks(res)).catch(err => console.log(err))
+        }
+    }
+
+    const onChange = (e) => {
+        setSearchValue(e.target.value)
+    }
+
 
     return (
         <div>
@@ -101,14 +129,16 @@ const BooksDashboard = () => {
                         <Typography variant='h2'>
                             Books
                         </Typography>
-                        <div className={classes.search}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon />
+                        <form onSubmit={onSearch}>
+                            <div className={classes.search}>
+                                <div className={classes.searchIcon}>
+                                    <SearchIcon />
+                                </div>
+                                <InputBase
+                                    placeholder="Search..." sx={{ fontSize: "25px" }} value={searchValue} onChange={onChange}
+                                />
                             </div>
-                            <InputBase
-                                placeholder="Search..." sx={{ fontSize: "25px" }}
-                            />
-                        </div>
+                        </form>
                     </Box>
                     <div style={{ height: 400, width: '100%' }}>
                         <DataGrid
@@ -118,7 +148,7 @@ const BooksDashboard = () => {
                             rowsPerPageOptions={[5]}
                             disableColumnMenu
                             disableSelectionOnClick
-
+                            loading={loading}
                             onColumnHeaderClick={onHeaderClick}
                         />
                     </div>

@@ -61,17 +61,19 @@ const EditPublisher = () => {
             return
         }
         let publisher = {
-            name: values.name,
+            name: values.name || undefined,
             address: {
-                road: values.road,
-                zipCode: values.zipCode,
-                city: values.city,
-                country: values.country,
+                road: values.road || undefined,
+                zipCode: values.zipCode || undefined,
+                city: values.city || undefined,
+                country: values.country || undefined,
             }
         }
         updatePublisher(publisherId, publisher).then(response => {
             if (response.message) {
                 setValues({ ...values, redirect: true })
+            } else {
+                setErrors(response)
             }
         }).catch(err => console.log(err))
     }

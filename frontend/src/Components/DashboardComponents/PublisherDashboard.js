@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-import { listPublishers } from '../../ApiService/publisherApi';
+import { deletePublisher, listPublishers, searchedPublishers } from '../../ApiService/publisherApi';
 
 
 const useStyles = makeStyles({
@@ -45,34 +45,40 @@ const useStyles = makeStyles({
 const PublisherDashboard = () => {
 
     const [allPublishers, setAllPublishers] = useState([])
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
-        listPublishers().then(res => setAllPublishers(res)).catch(err => console.log(err))
+        listPublishers().then(res => {
+            setAllPublishers(res);
+            setLoading(false)
+        }).catch(err => console.log(err))
     }, [])
+    const [searchValue, setSearchValue] = useState("")
     let navigate = useNavigate();
     const classes = useStyles();
 
-
+    const onChange = (e) => {
+        setSearchValue(e.target.value)
+    }
 
     const rows = allPublishers.map((publisher, id) => {
         return { id: id + 1, name: publisher.name, country: publisher.address.country, _id: publisher._id }
     })
     const columns = [
-        { field: 'id', headerName: 'ID', width: 70, headerAlign: 'center', },
+        { field: 'id', headerName: 'ID', width: 70, headerAlign: "center", align: "center" },
         {
             field: 'name', headerName: 'Name', flex: 1,
             minWidth: 150,
-
         },
-        { field: 'country', headerName: 'Country', width: 130, headerAlign: 'center', },
+        { field: 'country', headerName: 'Country', width: 200, headerAlign: "center", align: "center" },
         {
             field: 'add', headerName: 'Add', width: 180,
             headerAlign: 'center',
             sortable: false,
-            
+
             renderCell: (params) => (
                 <Box >
                     <Button variant="contained" sx={{ mr: 1 }} onClick={() => onEditClick(params)}>Edit</Button>
-                    <Button variant="contained" sx={{ background: "red" }}>Delete</Button>
+                    <Button variant="contained" sx={{ background: "red" }} onClick={() => onDeleteClick(params)}>Delete</Button>
                 </Box>
 
             )
@@ -90,23 +96,39 @@ const PublisherDashboard = () => {
         }
     }
 
+    const onDeleteClick = (cellInfo) => {
+        deletePublisher(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
+        let newPublishers = allPublishers.filter(publisher => publisher._id !== cellInfo.row._id);
+        setAllPublishers(newPublishers)
+    }
+
+    const onSearch = (e) => {
+        e.preventDefault()
+        if (searchValue !== "") {
+            searchedPublishers(searchValue).then(res => setAllPublishers(res)).catch(err => console.log(err))
+        } else {
+            listPublishers().then(res => setAllPublishers(res)).catch(err => console.log(err))
+        }
+    }
+
     return (
         <div>
             <Container component="main" maxWidth="lg" sx={{ mt: 15 }}>
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-
                     <Box className={classes.box}>
                         <Typography variant='h2'>
                             Publishers
                         </Typography>
-                        <div className={classes.search}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon />
+                        <form onSubmit={onSearch}>
+                            <div className={classes.search}>
+                                <div className={classes.searchIcon}>
+                                    <SearchIcon />
+                                </div>
+                                <InputBase
+                                    placeholder="Search..." sx={{ fontSize: "25px" }} value={searchValue} onChange={onChange}
+                                />
                             </div>
-                            <InputBase
-                                placeholder="Search..." sx={{ fontSize: "25px" }}
-                            />
-                        </div>
+                        </form>
                     </Box>
                     <div style={{ height: 400, width: '100%' }}>
                         <DataGrid
@@ -117,6 +139,7 @@ const PublisherDashboard = () => {
                             disableColumnMenu
                             disableSelectionOnClick
                             onColumnHeaderClick={onHeaderClick}
+                            loading={loading}
                         />
                     </div>
                 </Paper>

@@ -3,7 +3,8 @@ import { makeStyles } from '@mui/styles';
 import { Avatar, Button, Card, CardContent, CardHeader, Container, FormControl, Grid, Input, InputLabel, Link, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { createAuthor } from '../../ApiService/authorApi';
 
 
 const useStyles = makeStyles({
@@ -14,7 +15,7 @@ const useStyles = makeStyles({
 const AddAuthor = () => {
     const classes = useStyles();
     let navigate = useNavigate();
-    let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    let emailRegex = /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     const [values, setValues] = useState({
         name: "",
         biography: "",
@@ -65,25 +66,42 @@ const AddAuthor = () => {
     const onSubmit = (e) => {
         let errorObject = {}
         e.preventDefault()
-        for (var key in values) {
-            if (key === "email" && values[key] !== "") {
-                if (!values[key].match(emailRegex)) errorObject.email = "Email is invalid!"
-            } else {
-                if (values[key] === "") errorObject[key] = `${key[0].toUpperCase()}${key.slice(1)} is required`
-            }
-        }
+        // for (var key in values) {
+        //     if (key === "email" && values[key] !== "") {
+        //         if (!values[key].match(emailRegex)) errorObject.email = "Email is invalid!"
+        //     } else {
+        //         if (values[key] === "") errorObject[key] = `${key[0].toUpperCase()}${key.slice(1)} is required`
+        //     }
+        // }
 
-        if (Object.keys(errorObject).length !== 0) {
-            setErrors(errorObject)
-            return
-        }
+        // if (Object.keys(errorObject).length !== 0) {
+        //     setErrors(errorObject)
+        //     return
+        // }
+
+        let formData = new FormData();
+        formData.append("name", values.name)
+        formData.append("biography", values.biography)
+        formData.append("img", values.img)
+        formData.append("birthDate", values.birthDate)
+        formData.append("email", values.email)
+
+        createAuthor(formData).then(res => {
+            if (res.message) {
+                setValues({ ...values, redirect: true })
+            } else {
+                setErrors(res)
+            }
+        }).catch(err => console.log(err))
     }
+
+    if (values.redirect) return <Navigate to={"/authorDashboard"} />
 
     return (
         <div>
             <Container maxWidth="md" component="main" sx={{ mt: 12, mb: 5 }}>
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Typography variant='h2' mb={3}>Add Book</Typography>
+                    <Typography variant='h2' mb={3}>Add Author</Typography>
                     <form onSubmit={(e) => onSubmit(e)} encType="multipart/form-data" autoComplete='off'>
                         <Grid container spacing={5} alignItems="flex-start">
                             <Grid item sm={8} xs={12}>

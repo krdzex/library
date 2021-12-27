@@ -5,10 +5,9 @@ import helmet from "helmet";
 import cors from "cors"
 import userRoutes from "./routes/user.routes"
 import authRoutes from "./routes/auth.routes"
-import courseRoutes from "./routes/course.routes"
 import publisherRoutes from "./routes/publisher.routes"
 import booksRoutes from "./routes/books.routes"
-
+import authorRoutes from "./routes/authors.routes"
 
 
 
@@ -21,8 +20,8 @@ app.use(helmet())
 app.use(cors())
 app.use("/", userRoutes)
 app.use("/", authRoutes)
-app.use("/", courseRoutes)
 app.use("/", publisherRoutes)
 app.use("/", booksRoutes)
+app.use("/", authorRoutes)
 
 export default app;

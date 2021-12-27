@@ -1,10 +1,11 @@
-import { Container, InputBase, Typography, Box, Paper, Button } from '@mui/material';
+import { Container, InputBase, Typography, Box, Paper, Button, Avatar } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { makeStyles } from '@mui/styles';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-
+import { deleteAuthor, listAuthors, searchedAuthors } from '../../ApiService/authorApi';
+import moment from "moment"
 const useStyles = makeStyles({
     search: {
         position: 'relative',
@@ -41,26 +42,47 @@ const useStyles = makeStyles({
 const AuthorDashboard = () => {
     const classes = useStyles();
     const navigate = useNavigate()
-    const rows = [
-        { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    ];
+    const [authors, setAuthors] = useState([]);
+    const [searchValue, setSearchValue] = useState("")
+    const [loading, setLoading] = useState(true)
+
+
+    useEffect(() => {
+        getAllAuthors()
+    }, [])
+
+    const getAllAuthors = async () => {
+        try {
+            let allAuthors = await listAuthors()
+            for (let i = 0; i < allAuthors.length; i++) {
+                allAuthors[i].birthDate = moment(allAuthors[i].birthDate).format("MM/DD/YYYY")
+            }
+            setAuthors(allAuthors)
+            setLoading(false)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const rows = authors.map((author, id) => {
+        return { id: id + 1, name: author.name, img: author.img, email: author.email, _id: author._id, birthDate: author.birthDate }
+    })
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'firstName', headerName: 'Image', width: 100, headerAlign: 'center', },
-        { field: 'daa', headerName: 'Name', width: 50, flex: 1, },
+        { field: 'id', headerName: 'ID', width: 70, headerAlign: "center", align: "center" },
+        {
+            field: 'img', headerName: 'Image', width: 100, headerAlign: 'center', sortable: false, align: 'center',
+            renderCell: (params) => (
+                <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/${params.value}`} />
+            )
+        },
+        { field: 'name', headerName: 'Name', width: 50, flex: 1, },
 
-        { field: 'lastName', headerName: 'DOB', width: 90, },
-        { field: 'email', headerName: 'Email', minWidth: 300
-     },
+        { field: 'birthDate', headerName: 'DOB', width: 110, headerAlign: "center", align: "center" },
+        {
+            field: 'email', headerName: 'Email', minWidth: 300
+        },
         {
             field: 'add', headerName: 'Add', width: 180,
             headerAlign: 'center',
@@ -69,7 +91,7 @@ const AuthorDashboard = () => {
             renderCell: (params) => (
                 <Box >
                     <Button variant="contained" sx={{ mr: 1 }} onClick={() => onEditClick(params)}>Edit</Button>
-                    <Button variant="contained" sx={{ background: "red" }}>Delete</Button>
+                    <Button variant="contained" sx={{ background: "red" }} onClick={() => onDeleteClick(params)}>Delete</Button>
                 </Box>
 
             )
@@ -77,13 +99,33 @@ const AuthorDashboard = () => {
     ];
 
     const onEditClick = (cellInfo) => {
-        navigate(`/editBook/${cellInfo.row._id}`);
+        navigate(`/editAuthor/${cellInfo.row._id}`);
     }
+
+    const onDeleteClick = (cellInfo) => {
+        deleteAuthor(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
+        let newAuthors = authors.filter(author => author._id !== cellInfo.row._id);
+        setAuthors(newAuthors)
+    }
+
 
     const onHeaderClick = (e) => {
         if (e.colDef.headerName === "Add") {
             navigate("/addAuthor");
         }
+    }
+
+    const onSearch = (e) => {
+        e.preventDefault()
+        if (searchValue !== "") {
+            searchedAuthors(searchValue).then(res => setAuthors(res)).catch(err => console.log(err))
+        } else {
+            listAuthors().then(res => setAuthors(res)).catch(err => console.log(err))
+        }
+    }
+
+    const onChange = (e) => {
+        setSearchValue(e.target.value)
     }
 
     return (
@@ -94,14 +136,16 @@ const AuthorDashboard = () => {
                         <Typography variant='h2'>
                             Authors
                         </Typography>
-                        <div className={classes.search}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon />
+                        <form onSubmit={onSearch}>
+                            <div className={classes.search}>
+                                <div className={classes.searchIcon}>
+                                    <SearchIcon />
+                                </div>
+                                <InputBase
+                                    placeholder="Search..." sx={{ fontSize: "25px" }} value={searchValue} onChange={onChange}
+                                />
                             </div>
-                            <InputBase
-                                placeholder="Search..." sx={{ fontSize: "25px" }}
-                            />
-                        </div>
+                        </form>
                     </Box>
                     <div style={{ height: 430, width: '100%' }}>
                         <DataGrid
@@ -112,6 +156,7 @@ const AuthorDashboard = () => {
                             disableColumnMenu
                             disableSelectionOnClick
                             onColumnHeaderClick={onHeaderClick}
+                            loading={loading}
                         />
                     </div>
                 </Paper>

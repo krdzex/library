@@ -30,8 +30,21 @@ const getBookInfo = (id) => {
     }).then(response => response.json()).catch(err => console.log(err))
 }
 
+const deleteBook = (id) => {
+    return fetch(`${url}/api/books/${id}`, {
+        method: "DELETE",
+    }).then(response => response.json()).catch(err => console.log(err))
+}
+
+const searchedBooks = (filter) => {
+    return fetch(`${url}/api/books/find/${filter}`, {
+        method: "GET",
+        headers: headers
+    }).then(response => response.json()).catch(err => console.log(err))
+}
 
 
 
 
-export { createBook, listBooks, updateBook, getBookInfo }
+
+export { createBook, listBooks, updateBook, getBookInfo, deleteBook,searchedBooks }
