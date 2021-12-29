@@ -1,11 +1,11 @@
 import Book from "../models/books.model"
-import errorHandler from "../helpers/dbErrorHandler"
+import AuthBook from "../models/authBooks.model"
 import _ from "lodash"
 import fs from "fs"
 import { promisify } from "util";
 import bookValidation from "../validations/book"
 
-const createBook = (req, res) => {
+const createBook = async (req, res) => {
     const deleteImg = promisify(fs.unlink)
     if (req.file !== undefined) {
         req.body.img = req.file.filename;
@@ -21,15 +21,21 @@ const createBook = (req, res) => {
         return res.status(400).json(errors)
     }
 
-    book.save((err, result) => {
-        if (err) {
-            return res.status(400).json(
-                errorHandler.getUniqueErrorMessage(err)
-            )
+    let result = await book.save()
+
+    if (req.body.authorBooks !== undefined) {
+        if (Array.isArray(req.body.authorBooks)) {
+            const authBookData = req.body.authorBooks.map((data, id) => {
+                return { book_Id: result._id, author_Id: data }
+            })
+            await AuthBook.insertMany(authBookData)
+        } else {
+            const authBookData = { book_Id: result._id, author_Id: req.body.authorBooks }
+            await AuthBook.insertMany(authBookData)
         }
-        res.status(200).json({
-            message: "Successfully created book!"
-        })
+    }
+    res.status(200).json({
+        message: "Successfully created book!"
     })
 }
 
@@ -41,11 +47,11 @@ const listBooks = (req, res) => {
 }
 
 
-const booksInformations = (req, res) => {
+const booksInformations = async (req, res) => {
     let id = req.params.bookId;
-    Book.findById(id).then(info => {
-        res.status(200).json(info)
-    }).catch(err => console.log(err))
+    let authorsBooks = await AuthBook.find({ book_Id: id });
+    let books = await Book.findById(id)
+    res.status(200).json({ bookInfo: books, authors: authorsBooks })
 }
 
 
@@ -71,6 +77,21 @@ const updateBook = async (req, res) => {
         deleteImg(`../frontend/public/images/${originalImg}`)
         book = _.extend(book, { img: req.file.filename })
     }
+
+
+    if (req.body.authorBooks !== undefined) {
+        if (Array.isArray(req.body.authorBooks)) {
+            const authBookData = req.body.authorBooks.map((data, id) => {
+                return { book_Id: req.body.book, author_Id: data }
+            })
+            await AuthBook.insertMany(authBookData)
+        } else {
+            const authBookData = { book_Id: req.body.book, author_Id: req.body.authorBooks }
+            await AuthBook.insertMany(authBookData)
+        }
+    }
+
+    await AuthBook.deleteMany({ _id: { $in: req.body.authorsToDelete } })
 
     book.save().then(res.json({ message: "Successfuly edited book" })).catch(err => console.log(err))
 }

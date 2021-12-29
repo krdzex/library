@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader, Container, FormControl, FormHelperText, Grid, Input, InputLabel, Link, MenuItem, Paper, Select, Skeleton, TextField, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+
+import { Button, Container, FormControl, FormHelperText, Grid, Input, InputLabel, MenuItem, Paper, Select, Skeleton, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { getPublisherInfo, listPublishers } from '../../ApiService/publisherApi';
-import { createBook, getBookInfo, updateBook } from '../../ApiService/booksApi';
+import { listPublishers } from '../../ApiService/publisherApi';
+import { getBookInfo, updateBook } from '../../ApiService/booksApi';
+import { getAuthorInfo, listAuthors } from '../../ApiService/authorApi';
 
-const useStyles = makeStyles({
-    button: {
-        minHeight: "50px",
-        '&:hover': {
-            background: "rgba(0, 0, 0, 0.3)!important"
-        }
-    }
-})
 
 const EditBook = () => {
     const navigate = useNavigate()
-    const classes = useStyles();
     const { bookId } = useParams()
     const [errors, setErrors] = useState({})
     const [loading, setLoading] = useState(true)
@@ -32,49 +24,59 @@ const EditBook = () => {
         publisherId: "",
         redirect: false
     })
+    const [originalAuthors, setOriginalAuthors] = useState("")
+    const [authorBooks, setAuthorBooks] = useState([])
+    const [allAuthors, setAllAuthors] = useState([])
+    const [selectedAuthor, setSelectedAuthor] = useState("")
+
+    const rows = authorBooks.map((author, id) => {
+        return { id: id + 1, authorId: author.author_Id, name: author.name }
+    })
+
+
+
+    const changeSelectedAuthor = (e) => {
+        setSelectedAuthor(e.target.value)
+    }
+
 
     const [publishersList, setPublishersList] = useState([])
 
-    useEffect(() => {
-        getData()
-    }, [bookId])
 
-    const getData = async () => {
+    const getData = useCallback(async () => {
         try {
             let allPublishers = await listPublishers();
             setPublishersList(allPublishers);
             let bookInformations = await getBookInfo(bookId)
             setValues({
-                title: bookInformations.title,
-                description: bookInformations.description,
-                img: bookInformations.img,
-                pages: bookInformations.pages,
-                price: bookInformations.price,
-                publisherId: bookInformations.publisher_id,
+                title: bookInformations.bookInfo.title,
+                description: bookInformations.bookInfo.description,
+                img: bookInformations.bookInfo.img,
+                pages: bookInformations.bookInfo.pages,
+                price: bookInformations.bookInfo.price,
+                publisherId: bookInformations.bookInfo.publisher_id,
                 redirect: false
             })
-            setOriginalImg(bookInformations.img)
+            setAuthorBooks(bookInformations.authors)
+            setOriginalImg(bookInformations.bookInfo.img)
+            setOriginalAuthors(bookInformations.authors)
+            let authors = await listAuthors();
+            setAllAuthors(authors)
             setLoading(false)
         } catch (error) {
             console.log(error)
         }
-    }
+    }, [bookId])
 
-    const rows = [
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    ];
+
+    useEffect(() => {
+        getData()
+    }, [bookId, getData])
 
     const columns = [
         {
-            field: 'id',
-            headerName: 'ID',
+            field: 'name',
+            headerName: 'Author Name',
             flex: 1,
             minWidth: 150,
         },
@@ -83,10 +85,50 @@ const EditBook = () => {
             headerName: "Action",
             width: 80,
             renderCell: (params) => (
-                <Button>Delete</Button>
-            )
+                <Button onClick={() => onDeleteClick(params)}>Delete</Button>
+            ),
+            sortable: false,
         },
     ];
+
+    const onDeleteClick = (cellData) => {
+        setTimeout(() => {
+            setAuthorBooks((prevState) => prevState.filter(data => data.author_Id !== cellData.row.authorId))
+        });
+    }
+
+    const onAddClick = () => {
+        if (selectedAuthor !== "") {
+            for (let i = 0; i < authorBooks.length; i++) {
+                if (authorBooks[i].author_Id === selectedAuthor) {
+                    return setErrors({ ...errors, author: "You are already author" })
+                }
+            }
+            setAuthorBooks(prevState => [...prevState, { author_Id: selectedAuthor }])
+            setSelectedAuthor("")
+            delete errors.author
+        } else {
+            setErrors({ ...errors, author: "First select author" })
+        }
+    }
+
+    const getAuthorInformations = useCallback(async () => {
+        let arrCopy = authorBooks.slice()
+        for (let i = 0; i < arrCopy.length; i++) {
+            let authorInformation = await getAuthorInfo(arrCopy[i].author_Id)
+            arrCopy[i].name = authorInformation.authorInfo.name
+        }
+        setAuthorBooks(arrCopy)
+
+    }, [authorBooks.length])
+
+    useEffect(() => {
+        getAuthorInformations()
+    }, [authorBooks.length, getAuthorInformations])
+
+
+
+
 
     const onSubmit = (e) => {
         let errorObject = {}
@@ -106,7 +148,14 @@ const EditBook = () => {
         formData.append("price", values.price)
         formData.append("img", values.img)
         formData.append("publisher_id", values.publisherId)
+        for (let i = 0; i < originalAuthors.length; i++) {
+            formData.append("authorsToDelete", originalAuthors[i]._id)
+        }
+        for (let i = 0; i < authorBooks.length; i++) {
+            formData.append("authorBooks", authorBooks[i].author_Id)
+        }
 
+        formData.append("book", bookId)
         updateBook(bookId, formData).then(res => {
             if (res.message) {
                 setValues({ ...values, redirect: true })
@@ -220,7 +269,7 @@ const EditBook = () => {
                                 height={"100%"}
                             >
                                 {loading ? <Skeleton variant="rectangular" height={200} /> : <Box>
-                                    <img src={process.env.PUBLIC_URL + `/images/${originalImg}`} width={"100%"} />
+                                    <img src={process.env.PUBLIC_URL + `/images/${originalImg}`} width={"100%"} alt='editImg' />
                                 </Box>}
 
                                 <label htmlFor="contained-button-file" >
@@ -229,11 +278,33 @@ const EditBook = () => {
                                         Upload Photo
                                     </Button>
                                 </label>
-                                <Box sx={{ height: "50px", width: "100%", mt: 2 }}>
-                                    <Button variant="outlined" sx={{ float: "right" }}>
-                                        Add Author
-                                    </Button>
-                                </Box>
+                                <Grid container columnSpacing={1}>
+                                    <Grid item xs={12} sm={8}>
+                                        <FormControl fullWidth margin="normal">
+                                            <InputLabel id="demo-simple-select-label">Author</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                label="Author"
+                                                onChange={changeSelectedAuthor}
+                                                value={selectedAuthor}
+                                                error={errors.author !== undefined}
+
+                                                sx={{ height: "50px" }}
+                                            >
+                                                {allAuthors.map((author, id) => {
+                                                    return <MenuItem value={author._id} key={id}>{author.name}</MenuItem>
+                                                })}
+                                            </Select>
+                                            {errors.author !== undefined && (<FormHelperText error={true}>{errors.author}</FormHelperText>)}
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <Button variant="outlined" fullWidth sx={{ mt: "16px", height: "50px" }} onClick={() => onAddClick()}>
+                                            Add
+                                        </Button>
+                                    </Grid>
+                                </Grid>
 
                                 <div style={{ height: 270, width: '100%' }}>
                                     <DataGrid
@@ -248,12 +319,12 @@ const EditBook = () => {
                                 </div>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" type='submit' fullWidth className={classes.button} sx={{ background: "#50C878" }}>
+                                <Button variant="contained" type='submit' fullWidth sx={{ background: "#50C878" }}>
                                     Submit
                                 </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" fullWidth className={classes.button} onClick={() => onGoBackClick()}>
+                                <Button variant="contained" fullWidth onClick={() => onGoBackClick()}>
                                     Go back
                                 </Button>
                             </Grid>

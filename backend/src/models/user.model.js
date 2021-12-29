@@ -2,26 +2,12 @@ import mongoose from "mongoose"
 import crypto from "crypto"
 
 const UserSchema = new mongoose.Schema({
-    firstName: { type: String, trim: true },
-    lastName: { type: String, trim: true },
-    email: {
-        type: String, trim: true,
-        unique: "Email already exists",
-    },
-    noOfCourses: { type: Number, default: 0 },
-    role: { type: String, default: false },
-    created: {
-        type: Date,
-        default: Date.now
-    },
-    active: { type: Boolean, default: false },
+    userName: { type: String, trim: true },
     hashed_password: {
         type: String,
         trim: true
     },
-    updated: Date,
     salt: String,
-    img: { type: String, default:"noImage.jpg" }
 })
 
 UserSchema.virtual("password").set(function (password) {

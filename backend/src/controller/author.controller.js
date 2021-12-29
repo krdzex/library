@@ -1,36 +1,48 @@
 import Author from "../models/authors.model"
-import errorHandler from "../helpers/dbErrorHandler"
 import _ from "lodash"
 import fs from "fs"
 import { promisify } from "util";
 import validateAuthor from "../validations/author"
+import AuthBook from "../models/authBooks.model"
 
-const createAuthor = (req, res) => {
-    if (req.file !== undefined) {
-        req.body.img = req.file.filename;
-    } else {
-        req.body.img = "";
-    }
-    const { errors, isValid } = validateAuthor(req.body);
-    const author = new Author(req.body);
-
-    if (!isValid) {
-        if (author.img !== "") {
-            deleteImg(`../frontend/public/images/${author.img}`)
+const createAuthor = async (req, res) => {
+    try {
+        if (req.file !== undefined) {
+            req.body.img = req.file.filename;
+        } else {
+            req.body.img = "";
         }
-        return res.status(400).json(errors)
-    }
+        const { errors, isValid } = validateAuthor(req.body);
+        const author = new Author(req.body);
 
-    author.save((err, result) => {
-        if (err) {
-            return res.status(400).json(
-                errorHandler.getUniqueErrorMessage(err)
-            )
+        if (!isValid) {
+            if (author.img !== "") {
+                deleteImg(`../frontend/public/images/${author.img}`)
+            }
+            return res.status(400).json(errors)
+        }
+
+        let result = await author.save()
+
+
+        if (req.body.authorBooks !== undefined) {
+            if (Array.isArray(req.body.authorBooks)) {
+                const authBookData = req.body.authorBooks.map((data, id) => {
+                    return { author_Id: result._id, book_Id: data }
+                })
+                await AuthBook.insertMany(authBookData)
+            } else {
+                const authBookData = { author_Id: result._id, book_Id: data }
+                await AuthBook.insertMany(authBookData)
+            }
         }
         res.status(200).json({
             message: "Successfully created book!"
         })
-    })
+    } catch (error) {
+        console.log(error)
+    }
+
 }
 
 
@@ -41,38 +53,63 @@ const listAuthors = (req, res) => {
 }
 
 
-const authorInformation = (req, res) => {
-    let id = req.params.authorsId;
-    Author.findById(id).then(info => {
-        res.status(200).json(info)
-    }).catch(err => console.log(err))
+const authorInformation = async (req, res) => {
+    try {
+        let id = req.params.authorsId;
+        let authorInfo = await Author.findById(id)
+        let authorsBooks = await AuthBook.find({ author_Id: id });
+        res.status(200).json({ authorInfo: authorInfo, booksInfo: authorsBooks })
+    } catch (error) {
+        console.log(error)
+    }
+
+
+
 }
 
 
 const updateAuthor = async (req, res) => {
-    const deleteImg = promisify(fs.unlink)
-    let id = req.params.authorsId;
-    let author = await Author.findById(id)
-    let originalImg = author.img;
-    if (req.file !== undefined) {
-        req.body.img = req.file.filename;
-    } else {
-        req.body.img = author.img;
-    }
-    const { errors, isValid } = validateAuthor(req.body);
-    if (!isValid) {
+    try {
+        const deleteImg = promisify(fs.unlink)
+        let id = req.params.authorsId;
+        let author = await Author.findById(id)
+        let originalImg = author.img;
         if (req.file !== undefined) {
-            deleteImg(`../frontend/public/images/${author.img}`)
+            req.body.img = req.file.filename;
+        } else {
+            req.body.img = author.img;
         }
-        return res.status(400).json(errors)
-    }
-    author = _.extend(author, req.body)
-    if (req.file !== undefined) {
-        deleteImg(`../frontend/public/images/${originalImg}`)
-        author = _.extend(author, { img: req.file.filename })
+        const { errors, isValid } = validateAuthor(req.body);
+        if (!isValid) {
+            if (req.file !== undefined) {
+                deleteImg(`../frontend/public/images/${author.img}`)
+            }
+            return res.status(400).json(errors)
+        }
+        author = _.extend(author, req.body)
+        if (req.file !== undefined) {
+            deleteImg(`../frontend/public/images/${originalImg}`)
+            author = _.extend(author, { img: req.file.filename })
+        }
+        if (req.body.authorBooks !== undefined) {
+            if (Array.isArray(req.body.authorBooks)) {
+                const authBookData = req.body.authorBooks.map((data, id) => {
+                    return { author_Id: req.body.author, book_Id: data }
+                })
+                await AuthBook.insertMany(authBookData)
+            } else {
+                const authBookData = {
+                    author_Id: req.body.author, book_Id: req.body.authorBooks
+                }
+                await AuthBook.insertMany(authBookData)
+            }
+        }
+        await AuthBook.deleteMany({ _id: { $in: req.body.booksToDelete } })
+        author.save().then(res.json({ message: "Successfuly edited author" })).catch(err => console.log(err))
+    } catch (error) {
+        console.log(error)
     }
 
-    author.save().then(res.json({ message: "Successfuly edited author" })).catch(err => console.log(err))
 }
 
 const deleteAuthor = async (req, res) => {

@@ -1,29 +1,27 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import Header from './Header';
-import { Avatar, Card, CardContent, CardHeader, Container, Grid, Typography } from '@mui/material';
+import { Avatar, Card, CardContent, Container, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 
-const useStyles = makeStyles({
-
-})
 
 
 const OurTeam = () => {
+
+
     return (
         <div>
-            <Header />
-            <Container maxWidth="md" component="main" sx={{ mt: 12,mb:5 }}>
-                <Typography variant='h2' mb={3}>Our Team</Typography>
+            <Container maxWidth="md" component="main" sx={{ mt: 12, mb: 5 }}>
+                <Typography variant='h2' mb={3} align='center' color={"white"}>Our Team</Typography>
                 <Grid container spacing={5} alignItems="flex-end">
                     <Grid
                         item
+                        xs={12}
                         sm={6}
                         md={4}
+
                     >
                         <Card>
-                            <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
+                            <Container sx={{ display: "flex", justifyContent: "center", mt: 4, minHeight: "100px" }}>
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person1.jpg`} sx={{ width: 100, height: 100 }} />
                             </Container>
                             <CardContent>
@@ -35,13 +33,13 @@ const OurTeam = () => {
                                         mb: 2,
                                     }}
                                 >
-                                    <Typography component="h2" variant="h3" color="text.primary">
+                                    <Typography component="h2" variant="h3" color="text.primary" align='center'>
                                         George Clooney
                                     </Typography>
 
 
                                 </Box>
-                                <Typography variant="h6" color="text.secondary">
+                                <Typography variant="h6" color="text.secondary" align='center' marginBottom={2}>
                                     Developer
                                 </Typography>
                                 <Typography>
@@ -58,7 +56,7 @@ const OurTeam = () => {
                         md={4}
                     >
                         <Card>
-                        <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
+                            <Container sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
 
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person2.jpg`} sx={{ width: 100, height: 100 }} />
 
@@ -72,12 +70,12 @@ const OurTeam = () => {
                                         mb: 2,
                                     }}
                                 >
-                                    <Typography component="h2" variant="h3" color="text.primary">
+                                    <Typography component="h2" variant="h3" color="text.primary" align='center'>
                                         Meryl Streep
                                     </Typography>
 
                                 </Box>
-                                <Typography variant="h6" color="text.secondary">
+                                <Typography variant="h6" color="text.secondary" align='center' marginBottom={2}>
                                     UI/UX Designer
                                 </Typography>
                                 <Typography>
@@ -94,7 +92,7 @@ const OurTeam = () => {
                         md={4}
                     >
                         <Card>
-                        <Container sx={{ display: "flex", justifyContent: "center" ,mt:4}}>
+                            <Container sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
 
                                 <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/person3.jpg`} sx={{ width: 100, height: 100 }} />
 
@@ -108,12 +106,12 @@ const OurTeam = () => {
                                         mb: 2,
                                     }}
                                 >
-                                    <Typography component="h2" variant="h3" color="text.primary">
+                                    <Typography component="h2" variant="h3" color="text.primary" align='center' >
                                         Antonui banderas
                                     </Typography>
 
                                 </Box>
-                                <Typography variant="h6" color="text.secondary">
+                                <Typography variant="h6" color="text.secondary" align='center' marginBottom={2}>
                                     QA Engineer
                                 </Typography>
                                 <Typography>

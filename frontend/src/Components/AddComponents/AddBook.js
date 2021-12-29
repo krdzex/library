@@ -1,39 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Avatar, Button, Card, CardContent, CardHeader, Container, FormControl, FormHelperText, Grid, Input, InputLabel, Link, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Container, FormControl, FormHelperText, Grid, Input, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { listPublishers } from '../../ApiService/publisherApi';
 import { createBook } from '../../ApiService/booksApi';
+import { getAuthorInfo, listAuthors } from '../../ApiService/authorApi';
 
-const useStyles = makeStyles({
-    button: {
-        minHeight: "50px",
-        '&:hover': {
-            background: "rgba(0, 0, 0, 0.3)!important"
-        }
-    }
-})
 
 const AddBook = () => {
-    const classes = useStyles();
+    const [authorBooks, setAuthorBooks] = useState([])
+    const [allAuthors, setAllAuthors] = useState([])
+    const [selectedAuthor, setSelectedAuthor] = useState("")
 
-    const rows = [
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    ];
+    const rows = authorBooks.map((author, id) => {
+        return { id: id + 1, authorId: author.authorId, name: author.name }
+    })
 
     const columns = [
         {
-            field: 'id',
-            headerName: 'ID',
+            field: 'name',
+            headerName: 'Author Name',
             flex: 1,
             minWidth: 150,
         },
@@ -42,10 +29,17 @@ const AddBook = () => {
             headerName: "Action",
             width: 80,
             renderCell: (params) => (
-                <Button>Delete</Button>
-            )
+                <Button onClick={() => onDeleteClick(params)}>Delete</Button>
+            ),
+            sortable: false,
         },
     ];
+
+    const onDeleteClick = (cellData) => {
+        setTimeout(() => {
+            setAuthorBooks((prevState) => prevState.filter(data => data.authorId !== cellData.row.authorId))
+        });
+    }
 
     const onSubmit = (e) => {
 
@@ -68,7 +62,9 @@ const AddBook = () => {
         formData.append("price", values.price)
         formData.append("img", values.img)
         formData.append("publisher_id", values.publisher_id)
-
+        for (let i = 0; i < authorBooks.length; i++) {
+            formData.append("authorBooks", authorBooks[i].authorId)
+        }
         createBook(formData).then(res => {
             if (res.message) {
                 setValues({ ...values, redirect: true })
@@ -93,6 +89,7 @@ const AddBook = () => {
 
     useEffect(() => {
         listPublishers().then(res => setPublishersList(res)).catch(err => console.log(err))
+        listAuthors().then(res => setAllAuthors(res)).catch(err => console.log(err))
     }, [])
 
 
@@ -110,6 +107,40 @@ const AddBook = () => {
     const onChangeFile = (e) => {
         setValues({ ...values, img: e.target.files[0] })
     }
+
+    const changeSelectedAuthor = (e) => {
+        setSelectedAuthor(e.target.value)
+    }
+
+    const onAddClick = () => {
+        if (selectedAuthor !== "") {
+            for (let i = 0; i < authorBooks.length; i++) {
+                if (authorBooks[i].authorId === selectedAuthor) {
+                    return setErrors({ ...errors, author: "You are already author" })
+                }
+            }
+            setAuthorBooks(prevState => [...prevState, { authorId: selectedAuthor }])
+            setSelectedAuthor("")
+            delete errors.author
+        } else {
+            setErrors({ ...errors, author: "First select author" })
+        }
+    }
+
+    const getAuthorInformations = useCallback(async () => {
+        let arrCopy = authorBooks.slice()
+        if (arrCopy.length > 0) {
+            let authorInformation = await getAuthorInfo(arrCopy[arrCopy.length - 1].authorId)
+            arrCopy[arrCopy.length - 1].name = authorInformation.authorInfo.name
+            setAuthorBooks(arrCopy)
+        }
+
+    }, [authorBooks.length])
+
+
+    useEffect(() => {
+        getAuthorInformations()
+    }, [authorBooks.length, getAuthorInformations])
 
 
     if (values.redirect) return <Navigate to={"/booksDashboard"} />
@@ -212,11 +243,33 @@ const AddBook = () => {
                                         Upload Photo
                                     </Button>
                                 </label>
-                                <Box sx={{ height: "50px", width: "100%", mt: 2 }}>
-                                    <Button variant="outlined" sx={{ float: "right" }}>
-                                        Add Author
-                                    </Button>
-                                </Box>
+                                <Grid container columnSpacing={1}>
+                                    <Grid item xs={12} sm={8}>
+                                        <FormControl fullWidth margin="normal">
+                                            <InputLabel id="demo-simple-select-label">Author</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                label="Author"
+                                                onChange={changeSelectedAuthor}
+                                                value={selectedAuthor}
+                                                error={errors.author !== undefined}
+
+                                                sx={{ height: "50px" }}
+                                            >
+                                                {allAuthors.map((author, id) => {
+                                                    return <MenuItem value={author._id} key={id}>{author.name}</MenuItem>
+                                                })}
+                                            </Select>
+                                            {errors.author !== undefined && (<FormHelperText error={true}>{errors.author}</FormHelperText>)}
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <Button variant="outlined" fullWidth sx={{ mt: "16px", height: "50px" }} onClick={() => onAddClick()}>
+                                            Add
+                                        </Button>
+                                    </Grid>
+                                </Grid>
 
                                 <div style={{ height: 270, width: '100%' }}>
                                     <DataGrid
@@ -231,12 +284,12 @@ const AddBook = () => {
                                 </div>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" type='submit' fullWidth className={classes.button} sx={{ background: "#50C878" }}>
+                                <Button variant="contained" type='submit' fullWidth sx={{ background: "#50C878" }}>
                                     Submit
                                 </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" fullWidth className={classes.button} onClick={() => onGoBackClick()}>
+                                <Button variant="contained" fullWidth onClick={() => onGoBackClick()}>
                                     Go back
                                 </Button>
                             </Grid>

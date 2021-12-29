@@ -3,18 +3,18 @@ import User from "../models/user.model"
 import config from "../../config/config"
 
 const signIn = (req, res) => {
-    User.findOne({ "email": req.body.email }, (err, user) => {
+    User.findOne({ "userName": req.body.userName }, (err, user) => {
         if (err || !user) {
             return res.status("401").json({
-                email: "Email and password dont match",
-                password: "Email and password dont match",
+                userName: "Username and password dont match",
+                password: "Username and password dont match",
             })
         }
 
-        if (!user.authenticate(req.body.password) || user.active === false || user.role === "false") {
+        if (!user.authenticate(req.body.password)) {
             return res.status("401").json({
-                email: "Email and password dont match",
-                password: "Email and password dont match",
+                userName: "Username and password dont match",
+                password: "Username and password dont match",
             })
         }
 
