@@ -2,6 +2,7 @@ import config from "../config/config"
 import app from "./express"
 import mongoose from "mongoose"
 import Template from "../template"
+import { seedUsers } from "../seeder"
 
 
 mongoose.Promise = global.Promise;
@@ -10,6 +11,7 @@ mongoose.connect(config.mongoUri, {
     useUnifiedTopology: true
 }).then(() => {
     console.log("MongoDB connected")
+    seedUsers()
 }).catch(() => console.log("Error connecting on MongoDB"))
 
 app.listen(config.port, (err) => {

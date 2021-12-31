@@ -141,7 +141,7 @@ const EditAuthor = () => {
         for (let i = 0; i < authorBooks.length; i++) {
             formData.append("authorBooks", authorBooks[i].book_Id)
         }
-        
+
         formData.append("author", authorId)
 
         updateAuthor(authorId, formData).then(res => {
@@ -244,7 +244,7 @@ const EditAuthor = () => {
                                 height={"100%"}
                             >
                                 {loading ? <Skeleton variant="rectangular" height={200} /> : <Box>
-                                    <img src={process.env.PUBLIC_URL + `/images/${originalImg}`} alt='author img' width={"100%"} />
+                                    <img src={process.env.PUBLIC_URL + `/images/authors/${values.img}`} alt='author img' width={"100%"} />
                                 </Box>}
                                 <label htmlFor="contained-button-file" >
                                     <Input accept="image/*" id="contained-button-file" name="img" multiple type="file" sx={{ display: "none" }} onChange={onChangeFile} />

@@ -74,7 +74,7 @@ const AuthorDashboard = () => {
         {
             field: 'img', headerName: 'Image', width: 100, headerAlign: 'center', sortable: false, align: 'center',
             renderCell: (params) => (
-                <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/${params.value}`} />
+                <Avatar alt="Remy Sharp" src={process.env.PUBLIC_URL + `/images/authors/${params.value}`} />
             )
         },
         { field: 'name', headerName: 'Name', width: 50, flex: 1, },
