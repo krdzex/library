@@ -98,8 +98,9 @@ const PublisherDashboard = () => {
 
     const onDeleteClick = (cellInfo) => {
         deletePublisher(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
-        let newPublishers = allPublishers.filter(publisher => publisher._id !== cellInfo.row._id);
-        setAllPublishers(newPublishers)
+        setTimeout(() => {
+            setAllPublishers((prevPublishers) => prevPublishers.filter(publisher => publisher._id !== cellInfo.row._id))
+        });
     }
 
     const onSearch = (e) => {
