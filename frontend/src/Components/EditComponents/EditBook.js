@@ -269,7 +269,7 @@ const EditBook = () => {
                                 height={"100%"}
                             >
                                 {loading ? <Skeleton variant="rectangular" height={200} /> : <Box>
-                                    <img src={process.env.PUBLIC_URL + `/images/${originalImg}`} width={"100%"} alt='editImg' />
+                                    <img src={process.env.PUBLIC_URL + `/images/books/${originalImg}`} width={"100%"} alt='editImg' />
                                 </Box>}
 
                                 <label htmlFor="contained-button-file" >
@@ -320,7 +320,7 @@ const EditBook = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <Button variant="contained" type='submit' fullWidth sx={{ background: "#50C878" }}>
-                                    Submit
+                                    Update
                                 </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>

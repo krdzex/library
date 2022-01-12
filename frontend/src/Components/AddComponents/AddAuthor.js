@@ -260,7 +260,7 @@ const AddAuthor = () => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <Button variant="contained" type='submit' fullWidth sx={{ background: "#50C878" }}>
-                                    Submit
+                                    Add
                                 </Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>

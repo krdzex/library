@@ -1,12 +1,15 @@
-import mongoose from "mongoose"
-import crypto from "crypto"
+let mongoose = require("mongoose")
+
+let crypto = require("crypto")
 
 const UserSchema = new mongoose.Schema({
+    name: { type: String },
     userName: { type: String, trim: true },
     hashed_password: {
         type: String,
         trim: true
     },
+    role: { type: String },
     salt: String,
 })
 
@@ -34,6 +37,7 @@ UserSchema.methods = {
     }
 }
 
-export default mongoose.model("User", UserSchema)
+const User = mongoose.model("User", UserSchema);
+module.exports = User;
 
 

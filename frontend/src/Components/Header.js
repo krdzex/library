@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, Toolbar } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { useSelector } from 'react-redux';
@@ -42,9 +42,8 @@ const Header = () => {
     return (
         <AppBar className={classes.appBar} color="default">
             <Toolbar className={classes.toolBar}>
-                <Typography variant="h4" color="inherit">
-                    Library
-                </Typography>
+                <img src={process.env.PUBLIC_URL + `/images/LibLogo.png`} style={{ height: "80px" }} alt='headerImg' />
+
                 {authHelper.isAuthentcated() || logged ? <nav>
                     <Link to={"/publisherDashboard"} className={classes.links}>
                         Publishers

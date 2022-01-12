@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+let mongoose = require("mongoose")
 
 
 const BookSchema = new mongoose.Schema({
@@ -11,6 +11,7 @@ const BookSchema = new mongoose.Schema({
     active: { type: Boolean, default: true }
 })
 
-export default mongoose.model("Book", BookSchema)
+const Book = mongoose.model("Book", BookSchema);
+module.exports = Book;
 
 

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { deleteBook, listBooks, searchedBooks } from '../../ApiService/booksApi';
+import authHelper from '../../Auth/authHelper';
 
 const useStyles = makeStyles({
     search: {
@@ -74,7 +75,7 @@ const BooksDashboard = () => {
             align: "center",
             width: 90,
         },
-        {
+        authHelper.isAuthentcated().role === "admin" && ({
             field: 'add', headerName: 'Add', width: 180,
             headerAlign: 'center',
             sortable: false,
@@ -86,7 +87,7 @@ const BooksDashboard = () => {
                 </Box>
 
             )
-        },
+        }),
     ];
 
     const onEditClick = (cellInfo) => {
@@ -95,8 +96,9 @@ const BooksDashboard = () => {
 
     const onDeleteClick = (cellInfo) => {
         deleteBook(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
-        let newBooks = allBooks.filter(book => book._id !== cellInfo.row._id);
-        setAllBooks(newBooks)
+        setTimeout(() => {
+            setAllBooks((prevBooks) => prevBooks.filter(book => book._id !== cellInfo.row._id))
+        });
     }
 
 

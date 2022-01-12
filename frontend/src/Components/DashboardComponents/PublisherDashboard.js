@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { deletePublisher, listPublishers, searchedPublishers } from '../../ApiService/publisherApi';
+import authHelper from '../../Auth/authHelper';
 
 
 const useStyles = makeStyles({
@@ -70,7 +71,7 @@ const PublisherDashboard = () => {
             minWidth: 150,
         },
         { field: 'country', headerName: 'Country', width: 200, headerAlign: "center", align: "center" },
-        {
+        authHelper.isAuthentcated().role === "admin" && ({
             field: 'add', headerName: 'Add', width: 180,
             headerAlign: 'center',
             sortable: false,
@@ -82,7 +83,7 @@ const PublisherDashboard = () => {
                 </Box>
 
             )
-        },
+        }),
 
 
     ];

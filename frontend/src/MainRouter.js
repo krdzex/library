@@ -12,6 +12,7 @@ import EditPublisher from './Components/EditComponents/EditPublisher';
 import EditBook from './Components/EditComponents/EditBook';
 import EditAuthor from './Components/EditComponents/EditAuthor';
 import PrivateRoute from './Auth/PrivateRoute';
+import AdminRoute from './Auth/AdminRoute';
 import OurTeam from './Components/OurTeam';
 import BlockedRoute from './Auth/BlockedRoute';
 import HomePage from './Components/HomePage';
@@ -29,18 +30,18 @@ const MainRouter = () => {
                     <Route path="homePage" element={<HomePage />} />
                 </Route>
                 <Route path="/" element={<PrivateRoute />}>
-                    <Route path="addPublisher" element={<AddPublisher />} />
                     <Route path="publisherDashboard" element={<PublisherDashboard />} />
                     <Route path="authorDashboard" element={<AuthorDashboard />} />
                     <Route path="booksDashboard" element={<BooksDashboard />} />
-                    <Route path="editPublisher/:publisherId" element={<EditPublisher />} />
-                    <Route path="editBook/:bookId" element={<EditBook />} />
-                    <Route path="editAuthor/:authorId" element={<EditAuthor />} />
-                    <Route path="addAuthor" element={<AddAuthor />} />
-                    <Route path="addBook" element={<AddBook />} />
+                    <Route path="/" element={<AdminRoute />}>
+                        <Route path="addPublisher" element={<AddPublisher />} />
+                        <Route path="editPublisher/:publisherId" element={<EditPublisher />} />
+                        <Route path="editBook/:bookId" element={<EditBook />} />
+                        <Route path="editAuthor/:authorId" element={<EditAuthor />} />
+                        <Route path="addAuthor" element={<AddAuthor />} />
+                        <Route path="addBook" element={<AddBook />} />
+                    </Route>
                 </Route>
-
-
             </Routes>
         </div>
 

@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+let mongoose = require("mongoose")
 
 
 const PublisherSchema = new mongoose.Schema({
@@ -7,6 +7,8 @@ const PublisherSchema = new mongoose.Schema({
     active: { type: Boolean, default: true }
 })
 
-export default mongoose.model("Publisher", PublisherSchema)
+const Publisher = mongoose.model("Publisher", PublisherSchema);
+module.exports = Publisher;
+
 
 

@@ -6,6 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { deleteAuthor, listAuthors, searchedAuthors } from '../../ApiService/authorApi';
 import moment from "moment"
+import authHelper from '../../Auth/authHelper';
 const useStyles = makeStyles({
     search: {
         position: 'relative',
@@ -36,8 +37,6 @@ const useStyles = makeStyles({
         alignItems: "center"
     }
 })
-
-
 
 const AuthorDashboard = () => {
     const classes = useStyles();
@@ -83,7 +82,7 @@ const AuthorDashboard = () => {
         {
             field: 'email', headerName: 'Email', minWidth: 300
         },
-        {
+        authHelper.isAuthentcated().role === "admin" && ({
             field: 'add', headerName: 'Add', width: 180,
             headerAlign: 'center',
             sortable: false,
@@ -95,7 +94,7 @@ const AuthorDashboard = () => {
                 </Box>
 
             )
-        },
+        })
     ];
 
     const onEditClick = (cellInfo) => {
@@ -104,8 +103,9 @@ const AuthorDashboard = () => {
 
     const onDeleteClick = (cellInfo) => {
         deleteAuthor(cellInfo.row._id).then(res => console.log(res)).catch(err => console.log(err))
-        let newAuthors = authors.filter(author => author._id !== cellInfo.row._id);
-        setAuthors(newAuthors)
+        setTimeout(() => {
+            setAuthors((prevAuthors) => prevAuthors.filter(author => author._id !== cellInfo.row._id))
+        });
     }
 
 
