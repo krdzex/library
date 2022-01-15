@@ -49,7 +49,8 @@ const PublisherDashboard = () => {
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         listPublishers().then(res => {
-            setAllPublishers(res);
+            
+            setAllPublishers(res.filter(publisher => publisher.active !== false));
             setLoading(false)
         }).catch(err => console.log(err))
     }, [])

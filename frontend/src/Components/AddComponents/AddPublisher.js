@@ -84,7 +84,7 @@ const AddPublisher = () => {
                                 onChange={onChange("name")}
                                 error={errors.name !== undefined}
                                 helperText={errors.name}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -97,7 +97,7 @@ const AddPublisher = () => {
                                 onChange={onChange("road")}
                                 error={errors.road !== undefined}
                                 helperText={errors.road}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -110,7 +110,7 @@ const AddPublisher = () => {
                                 onChange={onChange("city")}
                                 error={errors.city !== undefined}
                                 helperText={errors.city}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -124,7 +124,7 @@ const AddPublisher = () => {
                                 onChange={onChange("zipCode")}
                                 error={errors.zipCode !== undefined}
                                 helperText={errors.zipCode}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -139,7 +139,7 @@ const AddPublisher = () => {
                                 onChange={onChange("country")}
                                 error={errors.country !== undefined}
                                 helperText={errors.country}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

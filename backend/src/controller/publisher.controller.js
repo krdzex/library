@@ -24,7 +24,7 @@ const createPublisher = (req, res) => {
 
 
 const listPublishers = (req, res) => {
-    Publisher.find({active: true}).select("_id name address.country").then(publishers => {
+    Publisher.find().select("_id name address.country active").then(publishers => {
         res.status(200).json(publishers)
     })
 }

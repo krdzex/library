@@ -49,6 +49,9 @@ const AddBook = () => {
             if (values[key] === "")
                 errorObject[key] = `${key[0].toUpperCase()}${key.slice(1)} is required`
         }
+        if (authorBooks.length === 0) {
+            errorObject["author"] = `At least one author is required`
+        }
 
         if (Object.keys(errorObject).length !== 0) {
             setErrors(errorObject)
@@ -191,6 +194,12 @@ const AddBook = () => {
                                                 onChange={onChange("price")}
                                                 error={errors.price !== undefined}
                                                 helperText={errors.price}
+                                                InputProps={{
+                                                    inputProps: {
+                                                        min: 0,
+                                                        step: "any"
+                                                    }
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -203,6 +212,12 @@ const AddBook = () => {
                                                 onChange={onChange("pages")}
                                                 error={errors.pages !== undefined}
                                                 helperText={errors.pages}
+                                                InputProps={{
+                                                    inputProps: {
+                                                        min: 0,
+                                                        step: "any"
+                                                    }
+                                                }}
                                             />
                                         </Grid>
                                     </Grid>
@@ -219,7 +234,7 @@ const AddBook = () => {
 
                                             >
                                                 {publishersList.map((publisher, id) => {
-                                                    return <MenuItem value={publisher._id} key={id}>{publisher.name}</MenuItem>
+                                                    return <MenuItem value={publisher._id} key={id} sx={publisher.active === false ? { display: "none" } : {}}>{publisher.name}</MenuItem>
                                                 })}
 
                                             </Select>

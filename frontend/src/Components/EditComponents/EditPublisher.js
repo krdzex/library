@@ -87,7 +87,7 @@ const EditPublisher = () => {
         <div>
             <Container maxWidth="sm" component="main" sx={{ mt: 12, mb: 5 }}>
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Typography variant='h2' mb={3}>Add Publisher</Typography>
+                    <Typography variant='h2' mb={3}>Edit Publisher</Typography>
                     <Grid container spacing={3} component="form" onSubmit={onSubmit} autoComplete='off'>
                         <Grid item xs={12}>
                             <TextField
@@ -98,7 +98,6 @@ const EditPublisher = () => {
                                 onChange={onChange("name")}
                                 error={errors.name !== undefined}
                                 helperText={errors.name}
-                                focused
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -110,7 +109,7 @@ const EditPublisher = () => {
                                 onChange={onChange("road")}
                                 error={errors.road !== undefined}
                                 helperText={errors.road}
-                                focused
+                              
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -122,7 +121,7 @@ const EditPublisher = () => {
                                 onChange={onChange("city")}
                                 error={errors.city !== undefined}
                                 helperText={errors.city}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -135,7 +134,7 @@ const EditPublisher = () => {
                                 onChange={onChange("zipCode")}
                                 error={errors.zipCode !== undefined}
                                 helperText={errors.zipCode}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -149,7 +148,7 @@ const EditPublisher = () => {
                                 onChange={onChange("country")}
                                 error={errors.country !== undefined}
                                 helperText={errors.country}
-                                focused
+                                
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

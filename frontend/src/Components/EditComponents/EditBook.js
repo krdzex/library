@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Container, FormControl, FormHelperText, Grid, Input, InputLabel, MenuItem, Paper, Select, Skeleton, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { listPublishers } from '../../ApiService/publisherApi';
 import { getBookInfo, updateBook } from '../../ApiService/booksApi';
 import { getAuthorInfo, listAuthors } from '../../ApiService/authorApi';
@@ -79,6 +79,11 @@ const EditBook = () => {
             headerName: 'Author Name',
             flex: 1,
             minWidth: 150,
+            renderCell: (params) => (
+                <Link to={`/editAuthor/${params.row.authorId}`}>
+                    {params.row.name}
+                </Link>
+            ),
         },
         {
             field: 'lastName',
@@ -137,6 +142,10 @@ const EditBook = () => {
             if (values[key] === "")
                 errorObject[key] = `${key[0].toUpperCase()}${key.slice(1)} is required`
         }
+        if (authorBooks.length === 0) {
+            errorObject["author"] = `At least one author is required`
+        }
+
         if (Object.keys(errorObject).length !== 0) {
             setErrors(errorObject)
             return
@@ -178,14 +187,13 @@ const EditBook = () => {
         setValues({ ...values, img: e.target.files[0] })
     }
 
-
     if (values.redirect) return <Navigate to={"/booksDashboard"} />
 
     return (
         <div>
             <Container maxWidth="md" component="main" sx={{ mt: 12, mb: 5 }}>
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Typography variant='h2' align="center" mb={3}>Add Book</Typography>
+                    <Typography variant='h2' align="center" mb={3}>Edit Book</Typography>
                     <form onSubmit={(e) => onSubmit(e)} encType="multipart/form-data" autoComplete='off'>
                         <Grid container spacing={5} alignItems="flex-start">
                             <Grid item sm={8} xs={12}>
@@ -227,6 +235,12 @@ const EditBook = () => {
                                                 onChange={onChange("price")}
                                                 error={errors.price !== undefined}
                                                 helperText={errors.price}
+                                                InputProps={{
+                                                    inputProps: {
+                                                        min: 0,
+                                                        step: "any"
+                                                    }
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -239,6 +253,12 @@ const EditBook = () => {
                                                 onChange={onChange("pages")}
                                                 error={errors.pages !== undefined}
                                                 helperText={errors.pages}
+                                                InputProps={{
+                                                    inputProps: {
+                                                        min: 0,
+                                                        step: "any"
+                                                    }
+                                                }}
                                             />
                                         </Grid>
                                     </Grid>
@@ -252,7 +272,7 @@ const EditBook = () => {
                                                 error={errors.publisherId !== undefined}
                                             >
                                                 {publishersList.map((publisher, id) => {
-                                                    return <MenuItem value={publisher._id} key={id}>{publisher.name}</MenuItem>
+                                                    return <MenuItem value={publisher._id} key={id} sx={publisher.active === false ? { display: "none" } : {}}>{publisher.name}</MenuItem>
                                                 })}
 
                                             </Select>
@@ -289,11 +309,10 @@ const EditBook = () => {
                                                 onChange={changeSelectedAuthor}
                                                 value={selectedAuthor}
                                                 error={errors.author !== undefined}
-
                                                 sx={{ height: "50px" }}
                                             >
                                                 {allAuthors.map((author, id) => {
-                                                    return <MenuItem value={author._id} key={id}>{author.name}</MenuItem>
+                                                    return <MenuItem value={author._id} key={id}> {author.name}</MenuItem>
                                                 })}
                                             </Select>
                                             {errors.author !== undefined && (<FormHelperText error={true}>{errors.author}</FormHelperText>)}
@@ -314,7 +333,6 @@ const EditBook = () => {
                                         rowsPerPageOptions={[3]}
                                         disableColumnMenu
                                         disableSelectionOnClick
-
                                     />
                                 </div>
                             </Grid>

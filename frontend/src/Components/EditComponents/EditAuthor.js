@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Button, Container, FormControl, FormHelperText, Grid, Input, InputLabel, MenuItem, Paper, Select, Skeleton, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGrid } from '@mui/x-data-grid';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { getAuthorInfo, updateAuthor } from '../../ApiService/authorApi';
 import moment from "moment"
 import { getBookInfo, listBooks } from '../../ApiService/booksApi';
@@ -86,6 +86,11 @@ const EditAuthor = () => {
             headerName: 'Book Title',
             flex: 1,
             minWidth: 150,
+            renderCell: (params) => (
+                <Link to={`/editBook/${params.row.bookId}`}>
+                    {params.row.title}
+                </Link>
+            ),
         },
         {
             field: 'add',
@@ -244,7 +249,7 @@ const EditAuthor = () => {
                                 height={"100%"}
                             >
                                 {loading ? <Skeleton variant="rectangular" height={200} /> : <Box>
-                                    <img src={process.env.PUBLIC_URL + `/images/authors/${values.img}`} alt='author img' width={"100%"} />
+                                    <img src={process.env.PUBLIC_URL + `/images/authors/${originalImg.img}`} alt='author img' width={"100%"} />
                                 </Box>}
                                 <label htmlFor="contained-button-file" >
                                     <Input accept="image/*" id="contained-button-file" name="img" multiple type="file" sx={{ display: "none" }} onChange={onChangeFile} />
